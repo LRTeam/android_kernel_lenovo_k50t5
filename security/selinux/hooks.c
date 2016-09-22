@@ -3119,19 +3119,17 @@ int ioctl_has_perm(const struct cred *cred, struct file *file,
 {
 	struct common_audit_data ad;
 	struct file_security_struct *fsec = file->f_security;
-	struct inode *inode = file->f_path.dentry->d_inode;
+	struct inode *inode = file_inode(file);
 	struct inode_security_struct *isec = inode->i_security;
 	struct lsm_ioctlop_audit ioctl;
 	u32 ssid = cred_sid(cred);
-	struct selinux_audit_data sad = {0,};
 	int rc;
 	u8 driver = cmd >> 8;
 	u8 xperm = cmd & 0xff;
 
-	COMMON_AUDIT_DATA_INIT(&ad, IOCTL_OP);
+	ad.type = LSM_AUDIT_DATA_IOCTL_OP;
 	ad.u.op = &ioctl;
 	ad.u.op->cmd = cmd;
-	ad.selinux_audit_data = &sad;
 	ad.u.op->path = file->f_path;
 
 	if (ssid != fsec->sid) {
